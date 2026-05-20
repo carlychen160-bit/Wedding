@@ -3,737 +3,495 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Save the Date! 我們的婚禮派對邀約</title>
-    <!-- Tailwind CSS -->
+    <title>We're Getting Married - 8/1 - RSVP</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Canvas Confetti for Celebration -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        wedding: {
-                            cream: '#F4EFEA',     // 奶油象牙白
-                            clay: '#C89673',      // 溫暖焦糖土
-                            bronze: '#8C5E45',    // 復古木紋褐
-                            dark: '#3E2E2A',      // 深可可褐
-                            gold: '#DFB07E',      // 復古霧金
-                            bg: '#FAF8F5'         // 溫柔米白
-                        }
-                    },
-                    fontFamily: {
-                        serif: ['Playfair Display', 'Cinzel', 'Noto Sans TC', 'serif'],
-                        sans: ['Noto Sans TC', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
     <style>
         body {
-            background-color: #F3ECE4;
-            background-image: radial-gradient(#DECFC2 1.2px, transparent 1.2px);
-            background-size: 28px 28px;
+            background-color: #FDF9F3;
+            font-family: 'Noto Sans TC', sans-serif;
+            color: #3E2E2A;
+            overflow-x: hidden;
         }
-        .polaroid-shadow {
-            box-shadow: 0 10px 25px -5px rgba(62, 46, 42, 0.15), 0 8px 10px -6px rgba(62, 46, 42, 0.15);
+        .font-serif { font-family: 'Playfair Display', serif; }
+
+        /* Animation for subtle hero text fade in */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .backdrop-blur-custom {
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+        .fade-in-down { animation: fadeInDown 1s ease-out; }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #F8F1E7; }
+        ::-webkit-scrollbar-thumb { background: #D4A373; border-radius: 3px; }
+        
+        /* Draggable sticker simulation styles (for reference) */
+        #calendar-section .relative .bg-white {
+            cursor: pointer;
+            transition: transform 0.2s;
         }
+        #calendar-section .relative .bg-white:hover {
+            transform: scale(1.05);
+        }
+
+        /* Music Controls Styles */
+        #music-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 50;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(5px);
+            padding: 10px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(162, 107, 84, 0.15);
+            border: 1px solid rgba(212, 163, 115, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        #music-controls:hover {
+            background: rgba(255, 255, 255, 0.9);
+        }
+        #music-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #D4A373;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+        }
+        #music-btn:hover { background: #A26B54; transform: scale(1.05); }
+        #music-btn.playing i::before { content: "\f04c"; } /* pause icon */
+        
+        /* Loading Overlay */
+        #submit-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(62, 46, 42, 0.8);
+            backdrop-filter: blur(3px);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        #submit-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        /* Draggable visual helper for music btn */
+        .handle-grab { cursor: grab; }
+        .handle-grab:active { cursor: grabbing; }
+
     </style>
 </head>
-<body class="font-sans text-wedding-dark antialiased min-h-screen py-6 sm:py-12 px-4 flex flex-col justify-between">
+<body class="leading-relaxed">
 
-    <!-- Main Container -->
-    <div class="max-w-4xl w-full mx-auto bg-wedding-bg rounded-3xl shadow-2xl overflow-hidden border border-wedding-cream relative mb-8">
+    <div id="hero-section" class="relative w-full aspect-[21/9] sm:aspect-[21/7] overflow-hidden bg-stone-900 group">
+        <img id="hero-photo" src="wedding1.jpg" alt="森林手牽手婚紗照" class="w-full h-full object-cover transition-transform duration-10000 group-hover:scale-105">
         
-        <!-- Top Hero Section (Image 1: Forest Wedding Photo) -->
-        <div class="h-80 md:h-[420px] relative flex flex-col items-center justify-end p-6 md:p-10 text-center overflow-hidden">
-            <!-- Background Image 1 (Forest) -->
-            <!-- Note: Please make sure 'wedding1.jpg' is in the same folder, or replace with a URL -->
-            <div class="absolute inset-0 bg-cover bg-center transform scale-105 transition-transform duration-1000" 
-                 style="background-image: url('wedding1.jpg'); background-position: center 30%;"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-stone-900/50 via-transparent to-stone-950/20"></div>
+        
+        <div class="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 text-center text-white z-10 w-full px-4 pt-10">
+            <h1 class="font-serif font-bold text-lg sm:text-2xl tracking-[0.4em] uppercase mb-1 sm:mb-2 text-white">
+                SAVE THE DATE
+            </h1>
+            <p class="font-light text-[10px] sm:text-xs tracking-[0.3em] uppercase mb-1 text-stone-100">
+                AUGUST 1, 2026
+            </p>
+        </div>
+        
+        <div class="absolute bottom-2 left-2 text-[10px] text-white/50 italic p-1 bg-black/30 rounded">Simulated Banner Area (wedding1.jpg)</div>
+    </div>
+
+    <div id="date-details" class="bg-stone-50 py-12 md:py-16 px-4">
+        <div class="max-w-6xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
             
-            <!-- Elegant Overlay/Gradient to make text readable -->
-            <div class="absolute inset-0 bg-gradient-to-t from-wedding-dark/80 via-wedding-dark/30 to-transparent"></div>
-            
-            <!-- Glassmorphism Text Badge -->
-            <div class="relative z-10 w-full max-w-lg bg-black/25 backdrop-blur-custom rounded-2xl p-6 border border-white/15 text-white mb-2">
-                <p class="font-serif tracking-[0.3em] text-wedding-gold text-xs sm:text-sm font-semibold uppercase mb-1">Our Wedding Party</p>
-                <h1 class="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-wider mb-2">SAVE THE DATE</h1>
-                <div class="w-20 h-[1.5px] bg-wedding-gold mx-auto mb-3"></div>
-                <p class="font-serif italic text-stone-200 text-base sm:text-lg">Are you ready to celebrate with us?</p>
+            <div id="calendar-section" class="flex flex-col items-center gap-2">
+                <div class="relative max-w-full w-full rounded-2xl overflow-hidden shadow-xl border border-stone-100" id="calendar-editor">
+                    <img id="calendar-photo" src="wedding2.jpg" alt="手拿月曆婚紗照特寫" class="w-full h-auto object-contain">
+                    
+                    <div id="date-patch" class="absolute cursor-move select-none flex items-center justify-center p-1.5 shadow-lg border border-stone-100" style="width: 52px; height: 52px; background-color: #F8F5F1; transform: translate(50%, 50%); border-radius: 4px; pointer-events: none; opacity: 0.95;">
+                        <span class="font-serif font-bold text-stone-800" style="font-size: 26px; line-height: 1; letter-spacing: -1px;">01</span>
+                    </div>
+                </div>
+                <div class="text-[10px] text-stone-400 italic">此「01」日期為設計貼紙，將完美覆蓋「06」在您的專屬照片 (wedding2.jpg) 上</div>
+            </div>
+
+            <div class="space-y-6 text-center md:text-left pt-6 md:pt-0">
+                <h2 class="font-serif font-bold text-4xl sm:text-5xl lg:text-6xl text-[#A26B54]">我們結婚啦！🎉</h2>
+                <p class="text-base sm:text-lg text-stone-600 max-w-xl mx-auto md:mx-0 leading-relaxed">
+                    在盛夏的綠蔭下，我們誠摯地邀請您分享這份喜悅。<br/>我們將於 8 月 1 日舉行婚禮派對，誠摯地期待您蒞臨，與我們共同開啟人生的新篇章。
+                </p>
+                
+                <div class="pt-2 flex flex-col items-center md:items-start gap-3">
+                    <div class="text-base font-bold text-stone-800 tracking-wide bg-stone-100 px-4 py-1.5 rounded-full inline-flex gap-2 items-center">
+                        <i class="fa-solid fa-calendar-heart text-[#D4A373]"></i>
+                        <span>2026.08.01</span>
+                    </div>
+                    
+                    <div id="countdown" class="grid grid-cols-4 gap-1.5 p-2 bg-white rounded-lg shadow-inner border border-stone-100 text-xs w-[200px]" data-date="2026-08-01T15:00:00">
+                        <div class="text-center p-1.5 bg-stone-100 rounded">
+                            <span id="days" class="font-bold text-sm text-[#A26B54]">00</span>
+                            <div class="text-[9px] text-stone-500 uppercase">D</div>
+                        </div>
+                        <div class="text-center p-1.5 bg-stone-100 rounded">
+                            <span id="hours" class="font-bold text-sm text-[#A26B54]">00</span>
+                            <div class="text-[9px] text-stone-500 uppercase">H</div>
+                        </div>
+                        <div class="text-center p-1.5 bg-stone-100 rounded">
+                            <span id="minutes" class="font-bold text-sm text-[#A26B54]">00</span>
+                            <div class="text-[9px] text-stone-500 uppercase">M</div>
+                        </div>
+                        <div class="text-center p-1.5 bg-stone-100 rounded">
+                            <span id="seconds" class="font-bold text-sm text-[#A26B54]">00</span>
+                            <div class="text-[9px] text-stone-500 uppercase">S</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-6">
+                    <a href="#rsvp-form" class="inline-flex items-center gap-2 bg-[#D4A373] text-white font-bold py-3 px-8 rounded-full transition hover:bg-[#A26B54] text-base shadow-md group">
+                        <span>填寫回覆表單 🎉</span>
+                        <i class="fa-solid fa-chevron-right text-xs transition-transform group-hover:translate-x-1"></i>
+                    </a>
+                </div>
             </div>
         </div>
+    </div>
 
-        <!-- Party Info Cards & Countdown -->
-        <div class="px-6 py-8 md:px-12 md:py-10 border-b border-stone-100 bg-[#FAF7F2]">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-stone-100 flex items-center justify-start gap-4">
-                    <div class="w-12 h-12 rounded-full bg-[#F5EDE4] flex items-center justify-center text-wedding-clay shrink-0">
-                        <i class="fa-regular fa-calendar-days text-xl"></i>
-                    </div>
-                    <div class="text-left">
-                        <p class="text-[10px] text-stone-400 font-bold tracking-wider uppercase">PARTY DATE</p>
-                        <p class="text-base font-bold text-wedding-dark">2026 年 8 月 1 日 (星期六)</p>
-                    </div>
-                </div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-stone-100 flex items-center justify-start gap-4">
-                    <div class="w-12 h-12 rounded-full bg-[#F5EDE4] flex items-center justify-center text-wedding-clay shrink-0">
-                        <i class="fa-regular fa-clock text-xl"></i>
-                    </div>
-                    <div class="text-left">
-                        <p class="text-[10px] text-stone-400 font-bold tracking-wider uppercase">PARTY TIME</p>
-                        <p class="text-base font-bold text-wedding-dark">下午 04:00 準時入席</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Countdown Timer -->
-            <div class="mt-6 bg-[#EFE7DF] p-4 rounded-2xl text-center border border-[#E6DAD0]">
-                <p class="text-xs tracking-wider text-wedding-bronze uppercase font-bold mb-2">
-                    <i class="fa-solid fa-heart-pulse animate-pulse mr-1"></i> 距離甜蜜派對開始還有
-                </p>
-                <div class="flex justify-center gap-4 text-wedding-dark font-serif">
-                    <div>
-                        <span id="days" class="text-2xl font-bold text-wedding-bronze">00</span>
-                        <p class="text-[9px] text-wedding-dark/60 font-sans font-semibold">DAYS</p>
-                    </div>
-                    <span class="text-2xl font-bold text-wedding-clay/50">:</span>
-                    <div>
-                        <span id="hours" class="text-2xl font-bold text-wedding-bronze">00</span>
-                        <p class="text-[9px] text-wedding-dark/60 font-sans font-semibold">HOURS</p>
-                    </div>
-                    <span class="text-2xl font-bold text-wedding-clay/50">:</span>
-                    <div>
-                        <span id="minutes" class="text-2xl font-bold text-wedding-bronze">00</span>
-                        <p class="text-[9px] text-wedding-dark/60 font-sans font-semibold">MINUTES</p>
-                    </div>
-                    <span class="text-2xl font-bold text-wedding-clay/50">:</span>
-                    <div>
-                        <span id="seconds" class="text-2xl font-bold text-wedding-bronze">00</span>
-                        <p class="text-[9px] text-wedding-dark/60 font-sans font-semibold">SECONDS</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-6 text-center max-w-xl mx-auto">
-                <p class="text-stone-500 text-sm leading-relaxed">
-                    我們要結婚了！🥂 誠摯邀請您來參加我們的婚禮派對，和我們一起吃吃喝喝、聊聊天、分享喜悅。請幫我們填寫以下表單以利統計人數與餐點唷！
-                </p>
-            </div>
-        </div>
-
-        <!-- Dynamic Content Area (Two-Column Layout on desktop) -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 p-6 md:p-12 items-start">
+    <div id="rsvp-form" class="py-20 px-4 bg-white">
+        <div class="max-w-2xl w-full mx-auto bg-white p-8 sm:p-12 rounded-3xl shadow-2xl border border-stone-100 space-y-12">
             
-            <!-- Left Side: Image 2 Card (Aesthetic Studio Calendar Photo) -->
-            <div class="md:col-span-5 flex flex-col items-center">
-                <div class="bg-white p-4 pb-6 rounded-xl polaroid-shadow border border-stone-200 w-full max-w-[320px] rotate-[-2deg] hover:rotate-0 transition-transform duration-500">
-                    <!-- Image 2 (Calendar Studio) -->
-                    <!-- Note: Please make sure 'wedding2.jpg' is in the same folder, or replace with a URL -->
-                    <div class="aspect-[3/4] w-full rounded-lg overflow-hidden bg-stone-100 mb-4 bg-cover bg-center shadow-inner"
-                         style="background-image: url('wedding2.jpg');"></div>
-                    <div class="text-center">
-                        <p class="font-serif italic text-lg text-wedding-bronze font-semibold">Save the Date</p>
-                        <p class="text-xs text-stone-400 font-medium tracking-widest mt-1">2026.08.01 • 04:00 PM</p>
+            <div class="text-center space-y-3">
+                <i class="fa-solid fa-gift text-4xl text-[#D4A373]"></i>
+                <h2 class="font-serif font-bold text-3xl sm:text-4xl text-stone-800">婚禮 RSVP 回覆表單</h2>
+                <p class="text-sm sm:text-base text-stone-500">親愛的嘉賓，請撥冗填寫以下表單，以利我們規劃當天行程。謝謝您！</p>
+                <div class="w-20 h-0.5 bg-[#D4A373] mx-auto pt-1 mt-4"></div>
+            </div>
+
+            <form id="google-sheet-form" class="space-y-10">
+                
+                <div class="space-y-3">
+                    <label for="name" class="block text-sm font-bold text-stone-700 flex items-center gap-2">
+                        <i class="fa-solid fa-user text-[#D4A373]"></i>
+                        <span>嘉賓姓名 (必填)</span>
+                    </label>
+                    <input type="text" id="name" name="name" required class="w-full px-5 py-3.5 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D4A373] bg-stone-50" placeholder="請輸入您的真實姓名">
+                </div>
+
+                <div class="space-y-3">
+                    <label for="phone" class="block text-sm font-bold text-stone-700 flex items-center gap-2">
+                        <i class="fa-solid fa-phone text-[#D4A373]"></i>
+                        <span>聯絡電話 (必填)</span>
+                    </label>
+                    <input type="tel" id="phone" name="phone" required class="w-full px-5 py-3.5 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D4A373] bg-stone-50" placeholder="請輸入您的聯絡手機">
+                </div>
+
+                <div class="space-y-3">
+                    <label class="block text-sm font-bold text-stone-700 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-question text-[#D4A373]"></i>
+                        <span>請問您是否能蒞臨參與派對？ (必填)</span>
+                    </label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="relative">
+                            <input type="radio" id="att-yes" name="attendance" value="蒞臨參與" required class="peer absolute opacity-0">
+                            <label for="att-yes" class="block w-full text-center px-6 py-4 bg-white border border-stone-200 rounded-xl cursor-pointer peer-checked:bg-[#D4A373] peer-checked:text-white peer-checked:border-[#D4A373] hover:bg-stone-50 transition">是的，我將蒞臨參與 🥂</label>
+                        </div>
+                        <div class="relative">
+                            <input type="radio" id="att-no" name="attendance" value="無法參加" required class="peer absolute opacity-0">
+                            <label for="att-no" class="block w-full text-center px-6 py-4 bg-white border border-stone-200 rounded-xl cursor-pointer peer-checked:bg-stone-600 peer-checked:text-white peer-checked:border-stone-600 hover:bg-stone-50 transition">很抱歉，無法參加 ❤️</label>
+                        </div>
                     </div>
+                </div>
+
+                <div id="additional-guests-wrapper" class="hidden space-y-6">
+                    <div class="space-y-3">
+                        <label for="guest-count" class="block text-sm font-bold text-stone-700 flex items-center gap-2">
+                            <i class="fa-solid fa-user-plus text-[#D4A373]"></i>
+                            <span>除了您之外，請問還有幾位同行親友？</span>
+                        </label>
+                        <div class="relative">
+                            <i class="fa-solid fa-users absolute left-5 top-1/2 -translate-y-1/2 text-stone-400"></i>
+                            <select id="guest-count" name="guests_count" class="w-full pl-14 pr-5 py-3.5 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D4A373] bg-stone-50 appearance-none">
+                                <option value="0" selected>0 位 (我自己一位)</option>
+                                <option value="1">1 位</option>
+                                <option value="2">2 位</option>
+                                <option value="3">3 位</option>
+                                <option value="4">4 位 (最多 4 位親友同行)</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none"></i>
+                        </div>
+                    </div>
+                    
+                    <div id="guest-names-area" class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden bg-stone-50 p-6 rounded-xl border border-stone-200">
+                        </div>
+                </div>
+
+                <div id="diet-diet-wrapper" class="hidden space-y-3">
+                    <label class="block text-sm font-bold text-stone-700 flex items-center gap-2">
+                        <i class="fa-solid fa-utensils text-[#D4A373]"></i>
+                        <span>嘉賓(們)的飲食習慣</span>
+                    </label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="relative">
+                            <input type="radio" id="diet-regular" name="diet" value="葷食" class="peer absolute opacity-0">
+                            <label for="diet-regular" class="block w-full text-center px-6 py-4 bg-white border border-stone-200 rounded-xl cursor-pointer peer-checked:bg-[#D4A373] peer-checked:text-white peer-checked:border-[#D4A373] hover:bg-stone-50 transition">葷食 🍖</label>
+                        </div>
+                        <div class="relative">
+                            <input type="radio" id="diet-vegetarian" name="diet" value="素食" class="peer absolute opacity-0">
+                            <label for="diet-vegetarian" class="block w-full text-center px-6 py-4 bg-white border border-stone-200 rounded-xl cursor-pointer peer-checked:bg-[#A26B54] peer-checked:text-white peer-checked:border-[#A26B54] hover:bg-stone-50 transition">素食 🥬</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <label for="blessing" class="block text-sm font-bold text-stone-700 flex items-center gap-2">
+                        <i class="fa-solid fa-heart text-[#D4A373]"></i>
+                        <span>給新人的話 (必填)</span>
+                    </label>
+                    <textarea id="blessing" name="blessing" required rows="3" class="w-full px-5 py-3.5 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D4A373] bg-stone-50 resize-none" placeholder="給新人的祝福，例如：恭喜你們！祝你們幸福快樂！"></textarea>
                 </div>
                 
-                <!-- Gentle Decorative Quote -->
-                <p class="mt-8 text-xs italic text-stone-400 text-center max-w-[240px] leading-relaxed">
-                    "Two hearts joining in friendship and love to create a life of shared moments."
-                </p>
-            </div>
-
-            <!-- Right Side: RSVP Form -->
-            <div id="form-section" class="md:col-span-7 space-y-6">
-                <!-- Loading Indicator -->
-                <div id="submit-loader" class="hidden text-center py-6 bg-white rounded-2xl shadow-sm border p-4">
-                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-wedding-clay border-t-transparent mb-2"></div>
-                    <p class="text-sm text-stone-500 font-semibold">正在將幸福傳送至試算表...</p>
+                <div class="space-y-3 pt-4 border-t border-stone-100">
+                    <label for="remarks" class="block text-xs font-bold text-stone-500 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-info text-stone-400"></i>
+                        <span>備註 (特殊需求，例如：需要嬰兒座椅、兒童餐、車位預留等)</span>
+                    </label>
+                    <textarea id="remarks" name="remarks" rows="2" class="w-full px-4 py-2.5 border border-stone-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#D4A373] bg-white resize-none text-xs" placeholder="若有特殊需求請註明在這邊"></textarea>
                 </div>
 
-                <form id="rsvpForm" class="space-y-5">
-                    <!-- Name -->
-                    <div class="space-y-1.5">
-                        <label class="block text-xs font-bold text-wedding-dark tracking-wider uppercase flex items-center gap-1.5" for="fullName">
-                            <span class="text-rose-500 text-xs">*</span> 您的姓名
-                        </label>
-                        <input type="text" id="fullName" required placeholder="請填寫您的真實姓名" 
-                            class="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-wedding-clay focus:border-wedding-clay outline-none transition duration-200 bg-white">
-                    </div>
-
-                    <!-- Number of Guests -->
-                    <div class="space-y-1.5">
-                        <label class="block text-xs font-bold text-wedding-dark tracking-wider uppercase flex items-center gap-1.5">
-                            <span class="text-rose-500 text-xs">*</span> 出席人數 (包含您本人)
-                        </label>
-                        <div class="grid grid-cols-4 gap-2">
-                            <button type="button" onclick="setGuestCount(1)" id="btn-count-1" class="guest-btn py-3 rounded-xl border text-sm font-semibold transition duration-200 bg-[#EFE7DF] border-wedding-clay text-wedding-dark shadow-sm">
-                                1 人
-                            </button>
-                            <button type="button" onclick="setGuestCount(2)" id="btn-count-2" class="guest-btn py-3 rounded-xl border text-sm font-semibold transition duration-200 border-stone-200 bg-white hover:bg-stone-50 text-stone-600">
-                                2 人
-                            </button>
-                            <button type="button" onclick="setGuestCount(3)" id="btn-count-3" class="guest-btn py-3 rounded-xl border text-sm font-semibold transition duration-200 border-stone-200 bg-white hover:bg-stone-50 text-stone-600">
-                                3 人
-                            </button>
-                            <button type="button" onclick="setGuestCount(4)" id="btn-count-4" class="guest-btn py-3 rounded-xl border text-sm font-semibold transition duration-200 border-stone-200 bg-white hover:bg-stone-50 text-stone-600">
-                                4人以上
-                            </button>
-                        </div>
-                        <input type="hidden" id="guestCount" value="1">
-                    </div>
-
-                    <!-- Extra Guests Names (Dynamic) -->
-                    <div id="extraGuestsWrapper" class="hidden space-y-1.5 bg-[#F5EDE4]/40 p-4 rounded-xl border border-wedding-cream transition-all duration-300">
-                        <label class="block text-xs font-bold text-wedding-dark tracking-wider flex items-center gap-1.5" for="extraNames">
-                            <span class="text-rose-500 text-xs">*</span> 同行親友姓名
-                        </label>
-                        <textarea id="extraNames" rows="2" placeholder="請填寫其他同行者的姓名（例如：王小明、林小華）" 
-                            class="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-wedding-clay focus:border-wedding-clay outline-none transition duration-200 bg-white"></textarea>
-                    </div>
-
-                    <!-- Accommodation Needed -->
-                    <div class="space-y-1.5">
-                        <label class="block text-xs font-bold text-wedding-dark tracking-wider uppercase flex items-center gap-1.5">
-                            <span class="text-rose-500 text-xs">*</span> 是否需要為您安排住宿？
-                        </label>
-                        <div class="grid grid-cols-2 gap-3">
-                            <label class="relative flex items-center justify-between p-4 rounded-xl border border-stone-200 bg-white hover:bg-stone-50/50 cursor-pointer transition">
-                                <span class="text-xs font-semibold">需要住宿 🏠</span>
-                                <input type="radio" name="accommodation" value="Yes" required class="w-4 h-4 text-wedding-clay focus:ring-wedding-clay border-stone-300">
-                            </label>
-                            <label class="relative flex items-center justify-between p-4 rounded-xl border border-stone-200 bg-white hover:bg-stone-50/50 cursor-pointer transition">
-                                <span class="text-xs font-semibold">不需要住宿</span>
-                                <input type="radio" name="accommodation" value="No" class="w-4 h-4 text-wedding-clay focus:ring-wedding-clay border-stone-300">
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Diet Preferences -->
-                    <div class="space-y-1.5">
-                        <label class="block text-xs font-bold text-wedding-dark tracking-wider uppercase flex items-center gap-1.5">
-                            <span class="text-rose-500 text-xs">*</span> 飲食習慣
-                        </label>
-                        <div class="grid grid-cols-2 gap-3">
-                            <label class="relative flex items-center justify-between p-4 rounded-xl border border-stone-200 bg-white hover:bg-stone-50/50 cursor-pointer transition">
-                                <span class="text-xs font-semibold">葷食 🥩</span>
-                                <input type="radio" name="diet" value="葷食" required class="w-4 h-4 text-wedding-clay focus:ring-wedding-clay border-stone-300">
-                            </label>
-                            <label class="relative flex items-center justify-between p-4 rounded-xl border border-stone-200 bg-white hover:bg-stone-50/50 cursor-pointer transition">
-                                <span class="text-xs font-semibold">全素 / 蛋奶素 🥗</span>
-                                <input type="radio" name="diet" value="素食" class="w-4 h-4 text-wedding-clay focus:ring-wedding-clay border-stone-300">
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Message to Couple -->
-                    <div class="space-y-1.5">
-                        <label class="block text-xs font-bold text-wedding-dark tracking-wider flex justify-between items-center" for="message">
-                            <span>有什麼話想對我們說嗎？</span>
-                            <span class="text-[10px] text-stone-400 font-normal italic">當面說也可以啦 😉</span>
-                        </label>
-                        <textarea id="message" rows="3" placeholder="留下您的祝福或悄悄話吧..." 
-                            class="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-wedding-clay focus:border-wedding-clay outline-none transition duration-200 bg-white"></textarea>
-                    </div>
-
-                    <!-- Submit Button -->
-                    <button type="submit" id="submitBtn"
-                        class="w-full bg-wedding-clay hover:bg-wedding-bronze text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 text-base mt-2">
-                        <i class="fa-regular fa-paper-plane"></i>
-                        送出幸福回覆
+                <div class="pt-8">
+                    <button type="submit" class="w-full flex items-center justify-center gap-3 bg-[#A26B54] text-white font-bold py-4 px-10 rounded-2xl transition hover:bg-[#8C5E45] text-lg shadow-xl flex-col items-center">
+                        <span>即刻送出回覆！💌</span>
+                        <span class="text-xs font-light text-stone-100">(We Can't Wait!)</span>
                     </button>
-                </form>
-            </div>
-
-            <!-- Submission Success State -->
-            <div id="success-section" class="hidden md:col-span-7 py-16 text-center space-y-6">
-                <div class="w-20 h-20 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center mx-auto text-4xl shadow-inner">
-                    <i class="fa-solid fa-heart animate-pulse"></i>
                 </div>
-                <div class="space-y-2">
-                    <h3 class="font-serif text-2xl font-bold text-wedding-dark">回覆成功！我們收到囉！</h3>
-                    <p id="success-subtext" class="text-stone-500 text-sm max-w-sm mx-auto">
-                        謝謝您花時間填寫，這對我們籌備派對有非常大的幫助。期待 8 月 1 日與您相見！✨
-                    </p>
-                </div>
-                <button onclick="resetForm()" class="text-sm font-semibold text-wedding-clay hover:text-wedding-bronze underline">
-                    再填寫一份表單
-                </button>
-            </div>
+            </form>
         </div>
     </div>
 
-    <!-- Admin Panel Toggle and View Area -->
-    <div class="max-w-4xl w-full mx-auto">
-        <div class="flex justify-between items-center mb-4 px-2">
-            <p class="text-[11px] text-stone-400"><i class="fa-solid fa-cloud"></i> 已與 Google 雲端試算表連結並即時同步中</p>
-            <button onclick="toggleAdminPanel()" class="text-[11px] font-bold text-wedding-clay hover:text-wedding-bronze flex items-center gap-1">
-                <i class="fa-solid fa-circle-user"></i> <span id="adminToggleText">開啟管理員後台</span>
-            </button>
+    <div class="py-8 px-4 bg-stone-100 text-center text-xs text-stone-500 border-t border-stone-200">
+        <p class="font-serif text-[#D4A373] mb-1 text-sm">#CarlyWillDoIt 💚</p>
+        <p>&copy; 2026 We are Getting Married. Carly & Her Partner. 08.01.2026</p>
+    </div>
+    
+    <div id="music-controls" class="handle-grab">
+        <div id="music-btn">
+            <i class="fa-solid fa-volume-xmark"></i>
         </div>
-
-        <!-- Admin Panel Card -->
-        <div id="admin-panel" class="hidden bg-white p-6 rounded-3xl shadow-lg border border-stone-200 space-y-6">
-            
-            <!-- Google Sheet Sync Settings -->
-            <div class="bg-amber-50/40 p-4 rounded-xl border border-[#E6DAD0] space-y-3">
-                <h4 class="font-bold text-sm text-wedding-bronze flex items-center gap-1.5">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> Google 試算表即時同步設定
-                </h4>
-                <div class="flex flex-col sm:flex-row gap-2">
-                    <input type="url" id="googleSheetsUrl" placeholder="https://script.google.com/macros/s/.../exec" 
-                        class="flex-1 px-3 py-2 text-xs rounded-lg border border-stone-200 focus:outline-none focus:ring-1 focus:ring-wedding-clay">
-                    <div class="flex gap-1.5">
-                        <button onclick="saveSheetsUrl()" class="bg-wedding-clay hover:bg-wedding-bronze text-white text-xs font-semibold py-2 px-4 rounded-lg transition shrink-0">
-                            儲存設定
-                        </button>
-                        <button onclick="testSheetsConnection()" class="bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold py-2 px-3 rounded-lg transition shrink-0">
-                            測試連線
-                        </button>
-                    </div>
-                </div>
-                <div id="sync-status" class="text-[10px] text-stone-400">已自動套用您的 Google Apps Script 雲端同步連結。</div>
-            </div>
-
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <h3 class="font-bold text-base text-wedding-dark flex items-center gap-2">
-                        <i class="fa-solid fa-chart-line text-wedding-clay"></i> 婚禮派對統計後台 (本機備份)
-                    </h3>
-                    <p class="text-xs text-stone-400">目前本機瀏覽器中暫存的已填寫資料列表</p>
-                </div>
-                <div class="flex gap-2">
-                    <button onclick="exportCSV()" class="bg-stone-50 hover:bg-stone-100 text-stone-700 text-xs font-semibold py-2 px-3 rounded-lg transition border border-stone-200">
-                        <i class="fa-solid fa-file-csv mr-1"></i> 匯出 CSV 檔
-                    </button>
-                    <button onclick="clearAllData()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-semibold py-2 px-3 rounded-lg transition border border-rose-100">
-                        <i class="fa-solid fa-trash-can mr-1"></i> 清空本機資料
-                    </button>
-                </div>
-            </div>
-
-            <!-- Stats grid -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div class="bg-stone-50 p-4 rounded-xl text-center border border-stone-100">
-                    <p class="text-2xl font-serif font-bold text-wedding-bronze" id="stat-total-forms">0</p>
-                    <p class="text-[10px] text-stone-400 font-bold tracking-wider">總填寫份數</p>
-                </div>
-                <div class="bg-stone-50 p-4 rounded-xl text-center border border-stone-100">
-                    <p class="text-2xl font-serif font-bold text-wedding-bronze" id="stat-total-people">0</p>
-                    <p class="text-[10px] text-stone-400 font-bold tracking-wider">出席總人數</p>
-                </div>
-                <div class="bg-stone-50 p-4 rounded-xl text-center border border-stone-100">
-                    <p class="text-2xl font-serif font-bold text-wedding-bronze" id="stat-accommodation">0</p>
-                    <p class="text-[10px] text-stone-400 font-bold tracking-wider">住宿需求人數</p>
-                </div>
-                <div class="bg-stone-50 p-4 rounded-xl text-center border border-stone-100">
-                    <p class="text-2xl font-serif font-bold text-wedding-bronze" id="stat-diet-meat">0 🥩 / 0 🥗</p>
-                    <p class="text-[10px] text-stone-400 font-bold tracking-wider">餐點 (葷/素)</p>
-                </div>
-            </div>
-
-            <!-- Table of Responses -->
-            <div class="overflow-x-auto rounded-xl border border-stone-150">
-                <table class="min-w-full text-sm text-left text-stone-500">
-                    <thead class="text-xs text-stone-700 uppercase bg-stone-50 font-bold border-b border-stone-150">
-                        <tr>
-                            <th scope="col" class="px-4 py-3">姓名</th>
-                            <th scope="col" class="px-4 py-3">出席人數</th>
-                            <th scope="col" class="px-4 py-3">同行親友</th>
-                            <th scope="col" class="px-4 py-3">住宿</th>
-                            <th scope="col" class="px-4 py-3">餐飲</th>
-                            <th scope="col" class="px-4 py-3">給新人的話</th>
-                        </tr>
-                    </thead>
-                    <tbody id="responseTableBody">
-                        <!-- Dynamic content -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <span class="text-[11px] font-medium text-stone-600">Background Music: <span class="font-bold text-[#A26B54]">Love in Canon</span></span>
     </div>
 
-    <!-- Custom Dialog Modal -->
-    <div id="system-dialog" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-stone-100 text-center space-y-4">
-            <div id="dialog-icon" class="w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl"></div>
-            <h4 id="dialog-title" class="font-bold text-stone-800"></h4>
-            <p id="dialog-desc" class="text-xs text-stone-500 leading-relaxed"></p>
-            <div class="flex gap-2 justify-center pt-2">
-                <button id="dialog-cancel-btn" onclick="closeDialog()" class="hidden px-4 py-2 text-xs font-semibold rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-600 transition">取消</button>
-                <button id="dialog-confirm-btn" onclick="closeDialog()" class="px-5 py-2 text-xs font-semibold rounded-lg bg-wedding-clay hover:bg-wedding-bronze text-white transition">確認</button>
-            </div>
-        </div>
+    <div id="submit-overlay">
+        <div class="w-20 h-20 border-4 border-[#D4A373] border-t-transparent rounded-full animate-spin mb-6"></div>
+        <h3 class="font-bold text-xl text-white">正在送出您的回覆...💌</h3>
+        <p class="text-white/80 mt-1">We can't wait to see you!</p>
     </div>
+    
+    <audio id="background-audio" preload="auto">
+        <source src="love_in_canon.mp3" type="audio/mpeg">
+        <source src="https://assets.mixkit.co/music/preview/mixkit-beautiful-dream-493.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
 
-    <!-- Footer -->
-    <footer class="mt-12 text-center text-xs text-stone-400 font-serif">
-        <p class="mb-1">With Love & Joy • August 1st, 2026</p>
-        <p>&copy; 2026 Our Wedding Party Group. All rights reserved.</p>
-    </footer>
-
-    <!-- Logic Script -->
     <script>
-        // Set countdown: August 1st, 2026 at 16:00:00
-        const countdownDate = new Date("Aug 1, 2026 16:00:00").getTime();
-        let dialogConfirmCallback = null;
-
-        // User's Google Sheet Integration API Endpoint
+        // Placeholder for Google Sheets API (needs user replacement)
         const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycbzPZTIEBUgShhD4dq3lMus8bjUgJUxhEkNj9_eozTchHT-6ALUjIsm-LZur6WwQUK6z/exec";
 
-        // Prepopulate the input and local storage
-// 💡 直接改成這一行，強迫瀏覽器每次都更新成最新的第 8 版網址！
-localStorage.setItem('weddingSheetsUrl', DEFAULT_SHEETS_URL);
-        
-        // Live Countdown Clock
-        const countdownTimer = setInterval(function() {
-            const now = new Date().getTime();
-            const distance = countdownDate - now;
+        // --- 1. Dynamic Additional Guest Names ---
+        const attendanceYes = document.getElementById('att-yes');
+        const attendanceNo = document.getElementById('att-no');
+        const addGuestsWrapper = document.getElementById('additional-guests-wrapper');
+        const dietWrapper = document.getElementById('diet-diet-wrapper');
+        const guestCountSelect = document.getElementById('guest-count');
+        const guestNamesArea = document.getElementById('guest-names-area');
 
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            document.getElementById("days").innerHTML = days < 10 ? "0" + days : days;
-            document.getElementById("hours").innerHTML = hours < 10 ? "0" + hours : hours;
-            document.getElementById("minutes").innerHTML = minutes < 10 ? "0" + minutes : minutes;
-            document.getElementById("seconds").innerHTML = seconds < 10 ? "0" + seconds : seconds;
-
-            if (distance < 0) {
-                clearInterval(countdownTimer);
-                document.getElementById("days").innerHTML = "00";
-                document.getElementById("hours").innerHTML = "00";
-                document.getElementById("minutes").innerHTML = "00";
-                document.getElementById("seconds").innerHTML = "00";
-            }
-        }, 1000);
-
-        // System Dialog Helpers
-        function showDialog(title, desc, type = 'success', showCancel = false, confirmText = '確認', confirmCallback = null) {
-            const dialog = document.getElementById('system-dialog');
-            const icon = document.getElementById('dialog-icon');
-            const cancelBtn = document.getElementById('dialog-cancel-btn');
-            const confirmBtn = document.getElementById('dialog-confirm-btn');
-            
-            document.getElementById('dialog-title').innerText = title;
-            document.getElementById('dialog-desc').innerText = desc;
-            confirmBtn.innerText = confirmText;
-            dialogConfirmCallback = confirmCallback;
-
-            if (type === 'success') {
-                icon.className = "w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl bg-emerald-50 text-emerald-500";
-                icon.innerHTML = `<i class="fa-solid fa-circle-check"></i>`;
-            } else if (type === 'error') {
-                icon.className = "w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl bg-rose-50 text-rose-500";
-                icon.innerHTML = `<i class="fa-solid fa-circle-xmark"></i>`;
+        function toggleGuestFields() {
+            if (attendanceYes.checked) {
+                addGuestsWrapper.classList.remove('hidden');
+                dietWrapper.classList.remove('hidden');
+                updateGuestNames();
             } else {
-                icon.className = "w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl bg-amber-50 text-amber-500";
-                icon.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i>`;
-            }
-
-            if (showCancel) {
-                cancelBtn.classList.remove('hidden');
-            } else {
-                cancelBtn.classList.add('hidden');
-            }
-
-            dialog.classList.remove('hidden');
-        }
-
-        function closeDialog() {
-            document.getElementById('system-dialog').classList.add('hidden');
-            if (dialogConfirmCallback) {
-                dialogConfirmCallback();
-                dialogConfirmCallback = null;
+                addGuestsWrapper.classList.add('hidden');
+                dietWrapper.classList.add('hidden');
             }
         }
 
-        // Set Guest Count
-        function setGuestCount(count) {
-            document.getElementById('guestCount').value = count;
+        // Generate input fields for each guest
+        function updateGuestNames() {
+            const count = parseInt(guestCountSelect.value);
+            guestNamesArea.innerHTML = '';
             
-            for (let i = 1; i <= 4; i++) {
-                const btn = document.getElementById(`btn-count-${i}`);
-                if (i === count) {
-                    btn.className = "guest-btn py-3 rounded-xl border text-sm font-semibold transition duration-200 bg-[#EFE7DF] border-wedding-clay text-wedding-dark shadow-sm";
-                } else {
-                    btn.className = "guest-btn py-3 rounded-xl border text-sm font-semibold transition duration-200 border-stone-200 bg-white hover:bg-stone-50 text-stone-600";
+            if (count > 0) {
+                guestNamesArea.classList.remove('hidden');
+                guestNamesArea.classList.add('grid');
+                for (let i = 1; i <= count; i++) {
+                    const fieldDiv = document.createElement('div');
+                    fieldDiv.classList.add('space-y-2');
+                    
+                    const label = document.createElement('label');
+                    label.classList.add('block', 'text-xs', 'font-bold', 'text-stone-600');
+                    label.innerHTML = `<i class="fa-solid fa-user-group text-[#D4A373] mr-1.5"></i> 同行親友 ${i} 姓名`;
+                    label.htmlFor = `guest_name_${i}`;
+                    
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.id = `guest_name_${i}`;
+                    input.name = `guest_name_${i}`;
+                    input.classList.add('w-full', 'px-4', 'py-2.5', 'border', 'border-stone-200', 'rounded-lg', 'focus:outline-none', 'focus:ring-1', 'focus:ring-[#D4A373]', 'bg-white', 'text-sm');
+                    input.placeholder = `請輸入親友 ${i} 姓名`;
+                    input.required = attendanceYes.checked; // Require if attending
+
+                    fieldDiv.appendChild(label);
+                    fieldDiv.appendChild(input);
+                    guestNamesArea.appendChild(fieldDiv);
+                }
+            } else {
+                guestNamesArea.classList.add('hidden');
+                guestNamesArea.classList.remove('grid');
+            }
+        }
+
+        attendanceYes.addEventListener('change', toggleGuestFields);
+        attendanceNo.addEventListener('change', toggleGuestFields);
+        guestCountSelect.addEventListener('change', updateGuestNames);
+
+
+        // --- 2. Smaller Countdown Timer (under date) ---
+        function updateCountdown() {
+            const countdown = document.getElementById('countdown');
+            const targetDateStr = countdown.getAttribute('data-date');
+            if (!targetDateStr) return;
+            const targetDate = new Date(targetDateStr);
+            const now = new Date();
+            
+            const diff = targetDate - now;
+            if (diff < 0) return; // Passed
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('days').innerText = String(days).padStart(2, '0');
+            document.getElementById('hours').innerText = String(hours).padStart(2, '0');
+            document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
+            document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+
+        // --- 3. Music Control Logic ("Love in Canon") ---
+        const audio = document.getElementById('background-audio');
+        const musicBtn = document.getElementById('music-btn');
+        let isMusicPlaying = false;
+
+        function toggleMusic() {
+            if (isMusicPlaying) {
+                audio.pause();
+                musicBtn.classList.remove('playing');
+                musicBtn.querySelector('i').classList.remove('fa-volume-high');
+                musicBtn.querySelector('i').classList.add('fa-volume-xmark');
+            } else {
+                // Audio is usually blocked on first load.
+                audio.play().then(() => {
+                    musicBtn.classList.add('playing');
+                    musicBtn.querySelector('i').classList.remove('fa-volume-xmark');
+                    musicBtn.querySelector('i').classList.add('fa-volume-high');
+                }).catch(error => {
+                    // Autoplay blocked. Show info or do nothing (btn is ready).
+                    console.log("Audio autoplay was blocked by browser. Please click the music button.");
+                    musicBtn.classList.add('bg-stone-400'); // hint blocked
+                    setTimeout(() => musicBtn.classList.remove('bg-stone-400'), 1000);
+                });
+            }
+            isMusicPlaying = !isMusicPlaying;
+        }
+
+        // Try to autoplay Canon on first interaction anywhere
+        document.body.addEventListener('click', () => {
+            if (!isMusicPlaying) toggleMusic();
+        }, { once: true }); // Only trigger once
+
+        musicBtn.addEventListener('click', toggleMusic);
+
+
+        // --- 4. Google Sheet Submission Logic ---
+        const form = document.getElementById('google-sheet-form');
+        const overlay = document.getElementById('submit-overlay');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            overlay.classList.add('visible');
+
+            // Collect form data including dynamic guest names
+            const formData = new FormData(form);
+            const dataObj = {};
+            formData.forEach((value, key) => {
+                dataObj[key] = value;
+            });
+
+            // Flatten dynamic guest names into a comma-separated string for simplicity
+            const guestCount = parseInt(dataObj['guests_count']) || 0;
+            let extraNames = [];
+            for (let i = 1; i <= guestCount; i++) {
+                if (dataObj[`guest_name_${i}`]) {
+                    extraNames.push(dataObj[`guest_name_${i}`]);
                 }
             }
+            dataObj['extra_names'] = extraNames.join(', ');
 
-            const wrapper = document.getElementById('extraGuestsWrapper');
-            const extraNamesInput = document.getElementById('extraNames');
-            if (count > 1) {
-                wrapper.classList.remove('hidden');
-                extraNamesInput.required = true;
-            } else {
-                wrapper.classList.add('hidden');
-                extraNamesInput.required = false;
-                extraNamesInput.value = '';
+            // Use defined URL or try to find it in Admin Backdoor
+            let sheetsUrl = DEFAULT_SHEETS_URL;
+            if (localStorage.getItem('weddingSheetsUrl')) {
+                sheetsUrl = localStorage.getItem('weddingSheetsUrl');
             }
-        }
 
-        // Sheets Config Save
-        function saveSheetsUrl() {
-            const urlInput = document.getElementById('googleSheetsUrl').value.trim();
-            if (urlInput === '') {
-                localStorage.removeItem('weddingSheetsUrl');
-                updateSyncStatusLabel();
-                showDialog('取消同步', '已移除雲端試算表網址，資料將僅會存在您的瀏覽器中。', 'warning');
+            if (!sheetsUrl || sheetsUrl.includes("請參閱上一張卡片排錯指南")) {
+                overlay.classList.remove('visible');
+                alert("❌ 請先設定您的 Google Sheets API 網址！\n請打開本頁原始碼，尋找 DEFAULT_SHEETS_URL 變數並替換您的部署網址。");
                 return;
             }
 
-            if (!urlInput.startsWith('https://script.google.com/')) {
-                showDialog('網址格式錯誤', '請確認網址開頭為 https://script.google.com/...', 'error');
-                return;
-            }
-
-            localStorage.setItem('weddingSheetsUrl', urlInput);
-            updateSyncStatusLabel();
-            showDialog('儲存成功', 'Google Sheets 雲端即時同步設定成功！', 'success');
-        }
-
-        function updateSyncStatusLabel() {
-            const savedUrl = localStorage.getItem('weddingSheetsUrl') || DEFAULT_SHEETS_URL;
-            const statusLabel = document.getElementById('sync-status');
-            const inputElement = document.getElementById('googleSheetsUrl');
-
-            if (savedUrl) {
-                inputElement.value = savedUrl;
-                statusLabel.innerHTML = `<span class="text-emerald-600 font-semibold"><i class="fa-solid fa-circle-check"></i> 已成功連線至您的 Google Sheets 試算表即時同步中</span>`;
-            } else {
-                statusLabel.innerHTML = `尚未綁定雲端 URL。若未綁定，資料仍會儲存於本機 LocalStorage 中。`;
-            }
-        }
-
-        // Test Cloud Connection
-        function testSheetsConnection() {
-            const savedUrl = localStorage.getItem('weddingSheetsUrl') || DEFAULT_SHEETS_URL;
-            if (!savedUrl) {
-                showDialog('未設定', '請先輸入網址並點選儲存設定。', 'warning');
-                return;
-            }
-
-            showDialog('連線測試成功', '已與雲端 Google 試算表順利連線！', 'success');
-        }
-
-        // Submit Button Event Listener
-        document.getElementById('rsvpForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('fullName').value.trim();
-            const count = parseInt(document.getElementById('guestCount').value);
-            const extraNames = document.getElementById('extraNames').value.trim();
-            const accommodation = document.querySelector('input[name="accommodation"]:checked').value;
-            const diet = document.querySelector('input[name="diet"]:checked').value;
-            const message = document.getElementById('message').value.trim() || '當面說！';
-
-            const record = {
-                id: Date.now(),
-                name,
-                count,
-                extraNames: count > 1 ? extraNames : '無',
-                accommodation: accommodation === 'Yes' ? '需要' : '不需要',
-                diet,
-                message
-            };
-
-            const savedUrl = localStorage.getItem('weddingSheetsUrl') || DEFAULT_SHEETS_URL;
-            const submitBtn = document.getElementById('submitBtn');
-            const loader = document.getElementById('submit-loader');
-
-            if (savedUrl) {
-                submitBtn.disabled = true;
-                loader.classList.remove('hidden');
-
-                fetch(savedUrl, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'text/plain'
-                    },
-                    body: JSON.stringify(record)
-                })
-                .then(() => {
-                    saveToLocalStorage(record);
-                    completeSubmission(true);
-                })
-                .catch(error => {
-                    console.error("Cloud submit failed, saving locally:", error);
-                    saveToLocalStorage(record);
-                    completeSubmission(false);
-                })
-                .finally(() => {
-                    submitBtn.disabled = false;
-                    loader.classList.add('hidden');
-                });
-            } else {
-                saveToLocalStorage(record);
-                completeSubmission(true);
-            }
+            // POST to Google Sheet Web App
+            fetch(sheetsUrl, {
+                method: 'POST',
+                mode: 'no-cors', // standard approach for simple GAS submission
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dataObj)
+            })
+            .then(() => {
+                overlay.classList.remove('visible');
+                alert("成功！我們收到您的回覆囉！🎉");
+                form.reset();
+                addGuestsWrapper.classList.add('hidden'); // reset dynamic fields
+                updateGuestNames();
+            })
+            .catch(error => {
+                overlay.classList.remove('visible');
+                console.error('Error submitting form:', error);
+                alert("抱歉，送出時發生錯誤。請稍後再試。❌");
+            });
         });
-
-        function saveToLocalStorage(record) {
-            let submissions = JSON.parse(localStorage.getItem('weddingRSVP')) || [];
-            submissions.push(record);
-            localStorage.setItem('weddingRSVP', JSON.stringify(submissions));
-            renderAdminPanel();
-        }
-
-        function completeSubmission(isCloudSuccess) {
-            confetti({
-                particleCount: 160,
-                spread: 90,
-                origin: { y: 0.65 },
-                colors: ['#F4EFEA', '#C89673', '#8C5E45', '#FFF3B0', '#F19CBB']
-            });
-
-            const successSub = document.getElementById('success-subtext');
-            if (isCloudSuccess) {
-                successSub.innerHTML = `謝謝您花時間填寫，資料已安全上傳至新人的 Google Sheets 雲端，這對我們籌備派對有非常大的幫助。期待 8 月 1 日與您相見！✨`;
-            } else {
-                successSub.innerHTML = `謝謝您花時間填寫，資料已成功暫存於本機。期待 8 月 1 日與您相見！✨`;
-            }
-
-            document.getElementById('form-section').classList.add('hidden');
-            document.getElementById('success-section').classList.remove('hidden');
-        }
-
-        function resetForm() {
-            document.getElementById('rsvpForm').reset();
-            setGuestCount(1);
-            document.getElementById('form-section').classList.remove('hidden');
-            document.getElementById('success-section').classList.add('hidden');
-        }
-
-        function toggleAdminPanel() {
-            const panel = document.getElementById('admin-panel');
-            const toggleText = document.getElementById('adminToggleText');
-            
-            if (panel.classList.contains('hidden')) {
-                panel.classList.remove('hidden');
-                toggleText.innerText = "關閉管理員後台";
-                renderAdminPanel();
-                panel.scrollIntoView({ behavior: 'smooth' });
-            } else {
-                panel.classList.add('hidden');
-                toggleText.innerText = "開啟管理員後台";
-            }
-        }
-
-        function renderAdminPanel() {
-            const submissions = JSON.parse(localStorage.getItem('weddingRSVP')) || [];
-            const tbody = document.getElementById('responseTableBody');
-            
-            tbody.innerHTML = '';
-            let totalForms = submissions.length;
-            let totalPeople = 0;
-            let totalAccommodation = 0;
-            let dietMeat = 0;
-            let dietVeg = 0;
-
-            if (totalForms === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-stone-400 font-medium">尚無報名資料，趕快填寫第一份吧！</td></tr>`;
-            } else {
-                submissions.forEach(sub => {
-                    totalPeople += sub.count;
-                    if (sub.accommodation === '需要') {
-                        totalAccommodation += sub.count;
-                    }
-                    if (sub.diet === '葷食') {
-                        dietMeat += sub.count;
-                    } else {
-                        dietVeg += sub.count;
-                    }
-
-                    const tr = document.createElement('tr');
-                    tr.className = "border-b border-stone-100 hover:bg-stone-50/50";
-                    tr.innerHTML = `
-                        <td class="px-4 py-3 font-semibold text-stone-800">${escapeHtml(sub.name)}</td>
-                        <td class="px-4 py-3 font-medium">${sub.count} 人</td>
-                        <td class="px-4 py-3 text-stone-500 max-w-[120px] truncate" title="${escapeHtml(sub.extraNames)}">${escapeHtml(sub.extraNames)}</td>
-                        <td class="px-4 py-3">
-                            <span class="px-2 py-0.5 rounded text-[11px] font-bold ${sub.accommodation === '需要' ? 'bg-amber-50 text-amber-700' : 'bg-stone-50 text-stone-400'}">
-                                ${sub.accommodation}
-                            </span>
-                        </td>
-                        <td class="px-4 py-3">
-                            <span class="px-2 py-0.5 rounded text-[11px] font-bold ${sub.diet === '葷食' ? 'bg-orange-50 text-orange-700' : 'bg-emerald-50 text-emerald-700'}">
-                                ${sub.diet}
-                            </span>
-                        </td>
-                        <td class="px-4 py-3 text-stone-400 italic max-w-[150px] truncate" title="${escapeHtml(sub.message)}">${escapeHtml(sub.message)}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
-
-            document.getElementById('stat-total-forms').innerText = totalForms;
-            document.getElementById('stat-total-people').innerText = totalPeople;
-            document.getElementById('stat-accommodation').innerText = totalAccommodation;
-            document.getElementById('stat-diet-meat').innerText = `${dietMeat} / ${dietVeg}`;
-        }
-
-        function exportCSV() {
-            const submissions = JSON.parse(localStorage.getItem('weddingRSVP')) || [];
-            if (submissions.length === 0) {
-                showDialog('尚無資料', '目前沒有資料可以匯出喔！', 'warning');
-                return;
-            }
-
-            let csvContent = "\uFEFF"; // BOM for UTF-8 Excel support
-            csvContent += "姓名,出席人數,同行親友姓名,需要住宿,飲食習慣,想對新人的話\n";
-
-            submissions.forEach(sub => {
-                let row = `"${sub.name}","${sub.count}","${sub.extraNames.replace(/"/g, '""')}","${sub.accommodation}","${sub.diet}","${sub.message.replace(/"/g, '""')}"`;
-                csvContent += row + "\n";
-            });
-
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.setAttribute("href", url);
-            link.setAttribute("download", `wedding_rsvp_export_${Date.now()}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        function clearAllData() {
-            showDialog('確定清除？', '您確定要清除所有的本機表單報名紀錄嗎？這項動作無法復原喔！', 'warning', true, '確定清除', function() {
-                localStorage.removeItem('weddingRSVP');
-                renderAdminPanel();
-                showDialog('清除成功', '所有本機報名紀錄已清空！', 'success');
-            });
-        }
-
-        function escapeHtml(text) {
-            return text
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-        window.onload = function() {
-            updateSyncStatusLabel();
-            renderAdminPanel();
-        };
     </script>
 </body>
 </html>
