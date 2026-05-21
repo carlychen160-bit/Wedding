@@ -330,9 +330,8 @@
         let dialogConfirmCallback = null;
 
         // 🔒 高強度精準 Base64 重新封裝第 10 版專屬網址
-        const SECURE_HASH = "aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J4VUZucG90azVZZzZuUjRYbC1zNjg4eGFicWNvblEwdng3YXphR0lnMGlqMFU5R3V3UjlqZDVMWmd0bXktRW5TUS9leGVj";
-        const DEFAULT_SHEETS_URL = atob(SECURE_HASH);
-
+       const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycbxuFnpotk5Yg6nR4Xl-s688xabqconQ0vx7azaGIg0ij0U9GuwR9jd5LZgtmy-EnSQ/exec";
+    
         // Live Countdown Clock
         const countdownTimer = setInterval(function() {
             const now = new Date().getTime();
