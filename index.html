@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/commfetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <script>
         tailwind.config = {
@@ -104,7 +104,7 @@
                     <div class="text-left flex-1 min-w-0">
                         <p class="text-[10px] text-stone-400 font-bold tracking-wider uppercase">PARTY LOCATION</p>
                         <p class="text-base font-bold text-wedding-dark truncate">宜蘭 KO Villa</p>
-                        <a href="http://maps.google.com/?q=宜蘭 KO Villa" target="_blank" class="text-xs text-wedding-clay hover:text-wedding-bronze underline font-semibold inline-flex items-center gap-1 mt-0.5">
+                        <a href="https://maps.google.com/?q=宜蘭 KO Villa" target="_blank" class="text-xs text-wedding-clay hover:text-wedding-bronze underline font-semibold inline-flex items-center gap-1 mt-0.5">
                             查看 Google 地圖 <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
                         </a>
                     </div>
@@ -182,77 +182,95 @@
 
                     <div class="space-y-1.5">
                         <label class="block text-xs font-bold text-wedding-dark tracking-wider uppercase flex items-center gap-1.5">
-                            <span class="text-rose-500 text-xs">*</span> 出席人數 (包含您本人)
-                        </label>
-                        <div class="grid grid-cols-4 gap-2">
-                            <button type="button" onclick="setGuestCount(1)" id="btn-count-1" class="guest-btn py-3 rounded-xl border text-sm font-semibold transition duration-200 bg-[#EFE7DF] border-wedding-clay text-wedding-dark shadow-sm">
-                                1 人
-                            </button>
-                            <button type="button" onclick="setGuestCount(2)" id="btn-count-2" class="guest-btn py-3 rounded-xl border text-sm font-semibold transition duration-200 border-stone-200 bg-white hover:bg-stone-50 text-stone-600">
-                                2 人
-                            </button>
-                            <button type="button" onclick="setGuestCount(3)" id="btn-count-3" class="guest-btn py-3 rounded-xl border text-sm font-semibold transition duration-200 border-stone-200 bg-white hover:bg-stone-50 text-stone-600">
-                                3 人
-                            </button>
-                            <button type="button" onclick="setGuestCount(4)" id="btn-count-4" class="guest-btn py-3 rounded-xl border text-sm font-semibold transition duration-200 border-stone-200 bg-white hover:bg-stone-50 text-stone-600">
-                                4人以上
-                            </button>
-                        </div>
-                        <input type="hidden" id="guestCount" value="1">
-                    </div>
-
-                    <div id="extraGuestsWrapper" class="hidden space-y-3 bg-[#F5EDE4]/40 p-5 rounded-xl border border-wedding-cream transition-all duration-300">
-                        <label class="block text-xs font-bold text-wedding-dark tracking-wider uppercase flex items-center gap-1.5">
-                            <span class="text-rose-500 text-xs">*</span> 同行親友姓名
-                        </label>
-                        <div id="dynamicGuestContainer" class="space-y-3"></div>
-                    </div>
-
-                    <div class="space-y-1.5">
-                        <label class="block text-xs font-bold text-wedding-dark tracking-wider uppercase flex items-center gap-1.5">
-                            <span class="text-rose-500 text-xs">*</span> 是否需要為您安排住宿？
+                            <span class="text-rose-500 text-xs">*</span> 您會出席嗎？
                         </label>
                         <div class="grid grid-cols-2 gap-3">
                             <label class="relative flex items-center justify-between p-4 rounded-xl border border-stone-200 bg-white hover:bg-stone-50/50 cursor-pointer transition">
-                                <span class="text-xs font-semibold">需要住宿 🏠</span>
-                                <input type="radio" name="accommodation" value="Yes" required class="w-4 h-4 text-wedding-clay focus:ring-wedding-clay border-stone-300">
+                                <span class="text-xs font-semibold">我會出席 🥂</span>
+                                <input type="radio" name="attendance" value="我會出席" checked onclick="toggleAttendanceFlow(true)" class="w-4 h-4 text-wedding-clay focus:ring-wedding-clay border-stone-300">
                             </label>
                             <label class="relative flex items-center justify-between p-4 rounded-xl border border-stone-200 bg-white hover:bg-stone-50/50 cursor-pointer transition">
-                                <span class="text-xs font-semibold">不需要住宿</span>
-                                <input type="radio" name="accommodation" value="No" class="w-4 h-4 text-wedding-clay focus:ring-wedding-clay border-stone-300">
+                                <span class="text-xs font-semibold">剛好沒辦法 🥺</span>
+                                <input type="radio" name="attendance" value="剛好沒辦法" onclick="toggleAttendanceFlow(false)" class="w-4 h-4 text-wedding-clay focus:ring-wedding-clay border-stone-300">
                             </label>
                         </div>
                     </div>
 
-                    <div class="space-y-1.5">
-                        <label class="block text-xs font-bold text-wedding-dark tracking-wider uppercase flex items-center gap-1.5">
-                            <span class="text-rose-500 text-xs">*</span> 飲食習慣
-                        </label>
-                        <div class="grid grid-cols-2 gap-3">
-                            <label class="relative flex items-center justify-between p-4 rounded-xl border border-stone-200 bg-white hover:bg-stone-50/50 cursor-pointer transition">
-                                <span class="text-xs font-semibold">葷食 🥩</span>
-                                <input type="radio" name="diet" value="葷食" required class="w-4 h-4 text-wedding-clay focus:ring-wedding-clay border-stone-300">
+                    <div id="attendance-details-group" class="space-y-5">
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-wedding-dark tracking-wider uppercase flex items-center gap-1.5">
+                                <span class="text-rose-500 text-xs">*</span> 出席人數 (包含您本人)
                             </label>
-                            <label class="relative flex items-center justify-between p-4 rounded-xl border border-stone-200 bg-white hover:bg-stone-50/50 cursor-pointer transition">
-                                <span class="text-xs font-semibold">全素 / 蛋奶素 🥗</span>
-                                <input type="radio" name="diet" value="素食" class="w-4 h-4 text-wedding-clay focus:ring-wedding-clay border-stone-300">
+                            <div class="grid grid-cols-4 gap-2">
+                                <button type="button" onclick="setGuestCount(1)" id="btn-count-1" class="guest-btn py-3 rounded-xl border text-sm font-semibold transition duration-200 bg-[#EFE7DF] border-wedding-clay text-wedding-dark shadow-sm">
+                                    1 人
+                                </button>
+                                <button type="button" onclick="setGuestCount(2)" id="btn-count-2" class="guest-btn py-3 rounded-xl border text-sm font-semibold transition duration-200 border-stone-200 bg-white hover:bg-stone-50 text-stone-600">
+                                    2 人
+                                </button>
+                                <button type="button" onclick="setGuestCount(3)" id="btn-count-3" class="guest-btn py-3 rounded-xl border text-sm font-semibold transition duration-200 border-stone-200 bg-white hover:bg-stone-50 text-stone-600">
+                                    3 人
+                                </button>
+                                <button type="button" onclick="setGuestCount(4)" id="btn-count-4" class="guest-btn py-3 rounded-xl border text-sm font-semibold transition duration-200 border-stone-200 bg-white hover:bg-stone-50 text-stone-600">
+                                    4人以上
+                                </button>
+                            </div>
+                            <input type="hidden" id="guestCount" value="1">
+                        </div>
+
+                        <div id="extraGuestsWrapper" class="hidden space-y-3 bg-[#F5EDE4]/40 p-5 rounded-xl border border-wedding-cream transition-all duration-300">
+                            <label class="block text-xs font-bold text-wedding-dark tracking-wider uppercase flex items-center gap-1.5">
+                                <span class="text-rose-500 text-xs">*</span> 同行親友姓名
                             </label>
+                            <div id="dynamicGuestContainer" class="space-y-3"></div>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-wedding-dark tracking-wider uppercase flex items-center gap-1.5">
+                                <span class="text-rose-500 text-xs">*</span> 是否需要為您安排住宿？
+                            </label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="relative flex items-center justify-between p-4 rounded-xl border border-stone-200 bg-white hover:bg-stone-50/50 cursor-pointer transition">
+                                    <span class="text-xs font-semibold">需要住宿 🏠</span>
+                                    <input type="radio" name="accommodation" value="Yes" id="acc-yes" class="w-4 h-4 text-wedding-clay focus:ring-wedding-clay border-stone-300">
+                                </label>
+                                <label class="relative flex items-center justify-between p-4 rounded-xl border border-stone-200 bg-white hover:bg-stone-50/50 cursor-pointer transition">
+                                    <span class="text-xs font-semibold">不需要住宿</span>
+                                    <input type="radio" name="accommodation" value="No" id="acc-no" checked class="w-4 h-4 text-wedding-clay focus:ring-wedding-clay border-stone-300">
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-wedding-dark tracking-wider uppercase flex items-center gap-1.5">
+                                <span class="text-rose-500 text-xs">*</span> 飲食習慣
+                            </label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="relative flex items-center justify-between p-4 rounded-xl border border-stone-200 bg-white hover:bg-stone-50/50 cursor-pointer transition">
+                                    <span class="text-xs font-semibold">葷食 🥩</span>
+                                    <input type="radio" name="diet" value="葷食" id="diet-meat" checked class="w-4 h-4 text-wedding-clay focus:ring-wedding-clay border-stone-300">
+                                </label>
+                                <label class="relative flex items-center justify-between p-4 rounded-xl border border-stone-200 bg-white hover:bg-stone-50/50 cursor-pointer transition">
+                                    <span class="text-xs font-semibold">全素 / 蛋奶素 🥗</span>
+                                    <input type="radio" name="diet" value="素食" id="diet-veg" class="w-4 h-4 text-wedding-clay focus:ring-wedding-clay border-stone-300">
+                                </label>
+                            </div>
                         </div>
                     </div>
 
                     <div class="space-y-1.5">
                         <label class="block text-xs font-bold text-wedding-dark tracking-wider flex justify-between items-center" for="message">
-                            <span>有什麼話想對我們說嗎？ (選填)</span>
+                            <span id="msg-label-text">有什麼話想對我們說嗎？ (選填)</span>
                             <span class="text-[10px] text-stone-400 font-normal italic">當面說也可以啦 😉</span>
                         </label>
                         <textarea id="message" rows="2" placeholder="留下您的祝福 or 悄悄話吧..." 
                             class="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-wedding-clay focus:border-wedding-clay outline-none transition duration-200 bg-white"></textarea>
                     </div>
 
-                    <div class="space-y-1.5">
+                    <div id="remarks-group" class="space-y-1.5">
                         <label class="block text-xs font-bold text-wedding-dark tracking-wider flex items-center gap-1" for="remarks">
                             <i class="fa-solid fa-circle-info text-stone-400"></i>
-                            <span>備註 (選填，特殊需求，例如：需要嬰兒座椅、兒童餐、車位預留等)</span>
+                            <span>備註 (選填，例如：需要嬰兒座椅、兒童餐等)</span>
                         </label>
                         <textarea id="remarks" rows="2" placeholder="若有特殊座位或飲食要求請填寫在這邊" 
                             class="w-full px-4 py-2.5 rounded-xl border border-stone-200 focus:ring-2 focus:ring-wedding-clay focus:border-wedding-clay outline-none text-xs transition duration-200 bg-white"></textarea>
@@ -261,7 +279,7 @@
                     <button type="submit" id="submitBtn"
                         class="w-full bg-wedding-clay hover:bg-wedding-bronze text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 text-base mt-2">
                         <i class="fa-regular fa-paper-plane"></i>
-                        送出幸福回覆
+                        送出回覆
                     </button>
                 </form>
             </div>
@@ -273,7 +291,7 @@
                 <div class="space-y-2">
                     <h3 class="font-serif text-2xl font-bold text-wedding-dark">回覆成功！我們收到囉！</h3>
                     <p id="success-subtext" class="text-stone-500 text-sm max-w-sm mx-auto">
-                        謝謝您花時間填寫，資料已安全上傳至新人的 Google Sheets 雲端，這對我們籌備派對有非常大的幫助。期待 8 月 1 日與您相見！✨
+                        謝謝您花時間填寫，資料已安全上傳至新人的 Google Sheets 雲端。期待 8 月 1 日與您相見！✨
                     </p>
                 </div>
                 <button onclick="resetForm()" class="text-sm font-semibold text-wedding-clay hover:text-wedding-bronze underline">
@@ -329,11 +347,11 @@
     </footer>
 
     <script>
-        // Set countdown: August 1st, 2026 at 17:00:00 (更新至5點)
+        // Set countdown
         const countdownDate = new Date("Aug 1, 2026 17:00:00").getTime();
         let dialogConfirmCallback = null;
 
-        // 🔒 高強度字串拆解加密技術，防網路爬蟲
+        // 🔒 高強度安全防爬蟲通道
         const p1 = "https://script.google.com/macros/s/";
         const p2 = "AKfycbxuFnpotk5Yg6nR4Xl-s688xabqconQ0vx7azaGIg0ij0U9GuwR9jd5LZgtmy-EnSQ";
         const p3 = "/exec";
@@ -363,7 +381,7 @@
             }
         }, 1000);
 
-        // Music Play/Pause Controller
+        // Music Controller
         let isMusicPlaying = false;
         const bgMusic = document.getElementById('bgMusic');
         const musicIcon = document.getElementById('musicIcon');
@@ -378,7 +396,6 @@
                     isMusicPlaying = true;
                     musicIcon.className = "fa-solid fa-volume-high animate-bounce";
                 }).catch(err => {
-                    console.log("自動播放被瀏覽器限制：", err);
                     isMusicPlaying = false;
                     musicIcon.className = "fa-solid fa-volume-xmark";
                 });
@@ -397,14 +414,12 @@
             }
         }, { once: true });
 
-        // System Dialog Helpers
+        // System Dialog
         function showDialog(title, desc, type = 'success') {
             const dialog = document.getElementById('system-dialog');
             const icon = document.getElementById('dialog-icon');
-            
             document.getElementById('dialog-title').innerText = title;
             document.getElementById('dialog-desc').innerText = desc;
-
             if (type === 'success') {
                 icon.className = "w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl bg-emerald-50 text-emerald-500";
                 icon.innerHTML = `<i class="fa-solid fa-circle-check"></i>`;
@@ -417,6 +432,31 @@
 
         function closeDialog() {
             document.getElementById('system-dialog').classList.add('hidden');
+        }
+
+        // 切換出席意願的畫面顯示/隱藏流向
+        function toggleAttendanceFlow(willAttend) {
+            const detailsGroup = document.getElementById('attendance-details-group');
+            const remarksGroup = document.getElementById('remarks-group');
+            const msgLabel = document.getElementById('msg-label-text');
+            
+            if (willAttend) {
+                detailsGroup.classList.remove('hidden');
+                remarksGroup.classList.remove('hidden');
+                msgLabel.innerText = "有什麼話想對我們說嗎？ (選填)";
+                // 還原必填限制
+                document.getElementById('acc-yes').required = true;
+                document.getElementById('diet-meat').required = true;
+            } else {
+                detailsGroup.classList.add('hidden');
+                remarksGroup.classList.add('hidden');
+                msgLabel.innerText = "給新人的祝福與悄悄話 (必填)";
+                // 取消隱藏欄位的必填限制，避免無法送出
+                document.getElementById('acc-yes').required = false;
+                document.getElementById('acc-no').required = false;
+                document.getElementById('diet-meat').required = false;
+                document.getElementById('diet-veg').required = false;
+            }
         }
 
         // Set Guest Count
@@ -452,19 +492,28 @@
             }
         }
 
-        // Submit to Google Sheets
+        // Submit Form
         document.getElementById('rsvpForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const name = document.getElementById('fullName').value.trim();
-            const count = parseInt(document.getElementById('guestCount').value);
-            const accommodation = document.querySelector('input[name="accommodation"]:checked').value;
-            const diet = document.querySelector('input[name="diet"]:checked').value;
-            const message = document.getElementById('message').value.trim() || '當面說！';
-            const remarks = document.getElementById('remarks').value.trim() || '無';
+            const attendance = document.querySelector('input[name="attendance"]:checked').value;
+            
+            let count = 0;
+            let accommodation = '不出席';
+            let diet = '不出席';
+            let remarks = '無';
+            const message = document.getElementById('message').value.trim() || (attendance === '我會出席' ? '當面說！' : '新婚快樂！');
+
+            if (attendance === '我會出席') {
+                count = parseInt(document.getElementById('guestCount').value);
+                accommodation = document.querySelector('input[name="accommodation"]:checked').value === 'Yes' ? '需要' : '不需要';
+                diet = document.querySelector('input[name="diet"]:checked').value;
+                remarks = document.getElementById('remarks').value.trim() || '無';
+            }
 
             let companions = [];
-            if (count > 1) {
+            if (attendance === '我會出席' && count > 1) {
                 for (let j = 1; j < count; j++) {
                     const compInput = document.getElementById(`extraName_${j}`);
                     if (compInput && compInput.value.trim() !== '') {
@@ -477,10 +526,10 @@
             const record = {
                 id: Date.now(),
                 name,
-                phone: '已移除手機欄位',
+                attendance,  // 新增出席欄位送出
                 count,
                 extraNames: extraNamesString,
-                accommodation: accommodation === 'Yes' ? '需要' : '不需要',
+                accommodation,
                 diet,
                 message,
                 remarks
@@ -499,11 +548,11 @@
                 body: JSON.stringify(record)
             })
             .then(() => {
-                completeSubmission(true);
+                completeSubmission(true, attendance);
             })
             .catch(error => {
                 console.error("Submit failed:", error);
-                completeSubmission(false);
+                completeSubmission(false, attendance);
             })
             .finally(() => {
                 submitBtn.disabled = false;
@@ -511,8 +560,8 @@
             });
         });
 
-        function completeSubmission(isCloudSuccess) {
-            commfetti({
+        function completeSubmission(isCloudSuccess, attendance) {
+            confetti({
                 particleCount: 160,
                 spread: 90,
                 origin: { y: 0.65 },
@@ -521,7 +570,11 @@
 
             const successSub = document.getElementById('success-subtext');
             if (isCloudSuccess) {
-                successSub.innerHTML = `謝謝您花時間填寫，資料已安全上傳至新人的 Google Sheets 雲端，這對我們籌備派對有非常大的幫助。期待 8 月 1 日與您相見！✨`;
+                if (attendance === '我會出席') {
+                    successSub.innerHTML = `謝謝您花時間填寫，資料已安全上傳至新人的 Google Sheets 雲端。期待 8 月 1 日與您相見！✨`;
+                } else {
+                    successSub.innerHTML = `謝謝您的心意與祝福！資料已順利傳達給新人囉。雖然當天沒辦法碰面，但依然非常謝謝您！✨`;
+                }
             } else {
                 successSub.innerHTML = `謝謝您花時間填寫，但目前與試算表同步時遇到阻礙，建議您稍候重新填寫，或直接聯絡新人喔！✨`;
             }
@@ -533,6 +586,7 @@
         function resetForm() {
             document.getElementById('rsvpForm').reset();
             setGuestCount(1);
+            toggleAttendanceFlow(true);
             document.getElementById('form-section').classList.remove('hidden');
             document.getElementById('success-section').classList.add('hidden');
         }
