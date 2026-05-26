@@ -314,7 +314,7 @@
                 <p>其實很多人都問我們，怎麼突然決定要辦婚禮了。</p>
                 <p>一方面是因為我們以前總是笑著跟大家說「30歲再結婚吧」，結果今年霆宇真的30歲了，我們就開始慢慢討論這件事。</p>
                 <p>另一個更重要的原因，是從去年底到現在，身邊經歷了一些親友的離世與身體不適。尤其是霆宇最愛的外婆，一直很期待看到我們結婚的那天，但她在年初突然中風，到現在已經失智。</p>
-                <p>也讓我們突然覺得，其實婚禮不是為了形式，而是想趁還來得及的時候，把愛的人都聚在一起，一起參與這段快樂又珍規的人生時刻。</p>
+                <p>也讓我們突然覺得，其實婚禮不是為了形式，而是想趁還來得及的時候，把愛的人都聚在一起，一起參與這段快樂又珍貴的人生時刻。</p>
                 <p>收到這份表單的你們，都是我們一路以來最最珍惜的摯友。</p>
                 <p>謝謝你們陪著我們長大，一起出國踩點、一起開趴喝到掛，也一起經歷人生不同階段的喜怒哀樂。</p>
                 <p>有你們，真的是我們生活裡最美好的一部分❤️</p>
@@ -355,7 +355,7 @@
         <p>© 2026 Our Wedding Party Group. All rights reserved.</p>
     </footer>
 
-    <script {name="RSVP_Script"}>
+    <script>
         // Set countdown
         const countdownDate = new Date("Aug 1, 2026 17:00:00").getTime();
         let dialogConfirmCallback = null;
@@ -530,6 +530,7 @@
             }
             const extraNamesString = companions.length > 0 ? companions.join('、') : '無';
 
+            // ✨ 【修正重點】在這裡將打包的物件補上 remarks 屬性，讓資料能順利拋出
             const record = {
                 id: Date.now(),
                 name,
@@ -539,7 +540,7 @@
                 accommodation,
                 diet,
                 message,
-                remarks
+                remarks // 補上這行，資料才會上傳喔！
             };
 
             const submitBtn = document.getElementById('submitBtn');
